@@ -1,0 +1,13 @@
+authentication {
+
+    register = {
+        id
+        name
+        email
+        password
+        avatar
+        is_verified
+        created_at
+        updated_at
+    }
+}
