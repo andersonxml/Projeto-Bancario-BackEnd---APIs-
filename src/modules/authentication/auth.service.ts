@@ -1,11 +1,9 @@
-import type { RegisterDTO } from "./dto/register.dto.js";
+import type { RegisterDTO, LoginDTO } from "./dto/auth.dto.js";
+import jwt from "jsonwebtoken";
 import { prisma } from "../../shared/database/prisma.js";
 import bcrypt from "bcrypt"
 
 export class AuthService {
-    postLogin() {
-        
-    }
     async postRegister(data: RegisterDTO) {
         const hash = await bcrypt.hash(data.password, 10);
 
@@ -31,4 +29,23 @@ export class AuthService {
             role: result.role,
         }
     }
+    async postLogin(data: LoginDTO) {
+        const userExists = await prisma.users.findUnique({
+            where: {
+                email: data.email
+            }
+        })
+        if (!userExists) throw new Error("E-mail not already registered")
+
+        const verifyPassword = await bcrypt.compare(data.password, userExists.password)
+        if (!verifyPassword) throw new Error("Credencials invalids")
+
+        const accessToken = jwt.sign({ id: userExists.public_id}, process.env.JWT_KEY!, {expiresIn: "1d"});
+        
+        return {
+            message: 'Logged in with success.',
+            accessToken: accessToken
+        }
+    }
+
 }
