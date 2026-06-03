@@ -23,10 +23,13 @@ export class AuthService {
         })
 
         return {
-            id: result.public_id,
-            name: result.name,
-            email: result.email,
-            role: result.role,
+            message: 'E-mail registered with success.',
+            user: {
+                id: result.public_id,
+                name: result.name,
+                email: result.email,
+                role: result.role,
+            }
         }
     }
     async postLogin(data: LoginDTO) {
@@ -40,10 +43,13 @@ export class AuthService {
         const verifyPassword = await bcrypt.compare(data.password, userExists.password)
         if (!verifyPassword) throw new Error("Credencials invalids")
 
-        const accessToken = jwt.sign({ id: userExists.public_id}, process.env.JWT_KEY!, {expiresIn: "1d"});
+        const accessToken = jwt.sign({ 
+            sub: userExists.public_id, 
+            role: userExists.role 
+        }, process.env.JWT_KEY!, {expiresIn: "1d"});
         
         return {
-            message: 'Logged in with success.',
+            message: 'Logged in with success.', 
             accessToken: accessToken
         }
     }

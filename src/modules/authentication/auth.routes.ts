@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "./auth.controllers.js"; 
+import { authMiddleware } from "../../shared/middlewares/auth.middleware.js";
 
 export const authRoutes = Router();
 const authController = new AuthController();
@@ -12,3 +13,7 @@ authRoutes.post('/forgout-password', authController.forgoutPassword);
 authRoutes.post('/reset-password', authController.resetPassword);
 
 authRoutes.get('/me', authController.me);
+
+authRoutes.get('/teste', authMiddleware, (req, res) => {
+    res.send('ok');
+})

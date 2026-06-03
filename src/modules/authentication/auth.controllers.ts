@@ -17,7 +17,6 @@ export class AuthController {
 
     register = async (req: Request, res: Response) => {
         try {
-
             const body = RegisterModel.safeParse(req.body);
             if (!body.success) return res.status(400).json({ message: 'Check the fields.' })
             const result = await this.authService.postRegister(body.data);
