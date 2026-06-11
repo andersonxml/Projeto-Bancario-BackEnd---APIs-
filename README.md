@@ -20,8 +20,8 @@ Este projeto foi criado com o objetivo de aprofundar conhecimentos em:
 
 * [x] Estrutura de autenticação
 * [x] Cadastro de usuários
-* [ ] Login JWT
-* [ ] Middleware de autenticação
+* [x] Login JWT
+* [x] Middleware de autenticação
 * [ ] Recuperação de senha
 
 ### 🏦 Contas Bancárias
