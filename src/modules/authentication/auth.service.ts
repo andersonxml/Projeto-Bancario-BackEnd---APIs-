@@ -1,4 +1,4 @@
-import type { RegisterDTO, LoginDTO } from "./dto/auth.dto.js";
+import type { RegisterDTO, LoginDTO, MeDTO } from "./dto/auth.dto.js";
 import jwt from "jsonwebtoken";
 import { prisma } from "../../shared/database/prisma.js";
 import bcrypt from "bcrypt"
@@ -46,12 +46,31 @@ export class AuthService {
         const accessToken = jwt.sign({ 
             sub: userExists.public_id, 
             role: userExists.role 
-        }, process.env.JWT_KEY!, {expiresIn: "1d"});
+        }, process.env.JWT_KEY!, {expiresIn: "15m"});
+
+        // const refreshToken = jwt.sign({ 
+        //     sub: userExists.public_id, 
+        //     role: userExists.role 
+        // }, process.env.JWT_KEY!, {expiresIn: "8h"});
         
         return {
             message: 'Logged in with success.', 
             accessToken: accessToken
         }
     }
+    async getMe(data: MeDTO) {
+        const user = await prisma.users.findUnique({
+            where: {
+                public_id: data.sub
+            },
+            omit: {
+                password: true,
+                id: true,
+                public_id: true
+            }
+        })
+        if (!user) throw new Error("User not found")
 
+        return user
+    }
 }

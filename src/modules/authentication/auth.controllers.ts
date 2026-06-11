@@ -1,6 +1,8 @@
 import { AuthService } from "./auth.service.js";
 import type { Response, Request } from "express";
 import { z } from 'zod'
+import jwt from 'jsonwebtoken'
+import type { JWTPayload } from "../../shared/middlewares/auth.middleware.js";
 
 const LoginModel = z.object({
     email: z.string().email(),
@@ -46,5 +48,23 @@ export class AuthController {
     logout = async (req: Request, res: Response) => { }
     forgoutPassword = async (req: Request, res: Response) => { }
     resetPassword = async (req: Request, res: Response) => { }
-    me = async (req: Request, res: Response) => { }
+    me = async (req: Request, res: Response) => {
+        try {
+            const authorizationToken = req.headers.authorization;
+            if(!authorizationToken) return res.status(400).json({ message: 'Check the request'})
+            
+            const [, token] = authorizationToken?.split(" ");
+            const user = jwt.verify(token!, process.env.JWT_KEY!) as JWTPayload;
+            
+            console.log(user.sub);
+            
+            const result = await this.authService.getMe({sub: user.sub});
+            
+            res.send(result)
+        } catch (error: any) {
+            return res.status(400).json({
+                message: error.message
+            })
+        }
+    }
 }
